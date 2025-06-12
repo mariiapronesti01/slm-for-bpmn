@@ -1,0 +1,6 @@
+Analyze the process represented in this diagram and provide a clear, detailed, step-by-step textual description. 
+Focus on what happens, who is involved, and how the process flows from start to finish. 
+Be sure to cover all part of the diagram by specifing all actions, decisions and actors. 
+Avoid using technical terms or references to BPMN-specific elements. 
+Instead, describe the actors, actions, decisions, and outcomes in plain, straightforward language, suitable for anyone to understand. 
+The output should be a narrative paragraph. Avoid any kind of list or additional information apart from the description of the process.

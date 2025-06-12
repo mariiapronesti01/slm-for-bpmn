@@ -1,0 +1,83 @@
+[
+    {
+        "instruction": "You are an expert in transforming process descriptions into structured BPMN representations. Your task is to generate a Python dictionary following this structure:\n``` python\n{\n    'start_nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<start_node_name>',\n            'BPMNtype': 'startEvent',\n            'incoming': [],\n            'outgoing': ['<next_node_id>']\n        }\n    ],\n    'nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<node_name>',\n            'BPMNtype': '<BPMN_element_type>',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': ['<next_node_id>']\n        },\n        ...\n    ],\n    'end_nodes': [\n        {   \n            'id': '<unique_id>',\n            'name': '<end_node_name>',\n            'BPMNtype': 'endEvent',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': []\n        }\n    ],\n    'lanes' : [\n        {\n            'id': '<unique_id>',\n            'name' : '<lane_name>',\n            'nodes' : ['<id_of_node_in_lane>', ...]\n        },\n        ...\n    ]\n}\n```\nKey Rules:\n1. Lanes:\n- Include lanes only if multiple actors (or roles) are explicitly mentioned.\n- Exclude lanes if only \"You\" is mentioned as the actor.\n- When lanes exist, all BPMN elements, including start and end nodes, must belong to a lane.\n- Assign start and end nodes to the most appropriate lanes.\n2. Flows:\n- Tasks must have exactly one incoming and one outgoing connection.\n- Gateways:\n-- Splitting Gateway: 1 incoming, multiple outgoing.\n-- Merging Gateway: Multiple incoming, 1 outgoing.\n3. BPMN Element Types:\n- Events: startEvent, endEvent\n- Tasks: task, userTask, serviceTask, scriptTask, manualTask, sendTask, receiveTask, businessRuleTask\n- Gateways: exclusiveGateway, parallelGateway\n4. Output Requirements:\n- Produce a valid JSON-like Python dictionary.\n- Ensure unique IDs and valid connections.",
+        "input": "Here's the textual description you have to analyze: The process begins with me deciding to prepare a meal. First, I look over three different recipes: steak, pasta, and salad, to determine the best options. After reviewing the recipes, I reach out to my parents to let them know about the meal preparation and ask their opinion on what the main dish should be. My parents then choose the main dish, which influences what I will cook. Depending on their choice, I proceed to make one or more of the dishes: steak, pasta, or salad. Once the dishes are prepared, I combine them into a complete meal that is served. After everyone has eaten, I clean up to ensure everything is tidy, which concludes the entire process.",
+        "true_task": [
+            "Review pasta recipe",
+            "Review steak Recipe",
+            "Review salad recipe",
+            "Contact parents",
+            "Choose main dish",
+            "Make salad",
+            "Make steak",
+            "Make pasta",
+            "Serve meal",
+            "Clean up"
+        ],
+        "true_actors": [
+            "Me",
+            "Parents"
+        ]
+    },
+    {
+        "instruction": "You are an expert in transforming process descriptions into structured BPMN representations. Your task is to generate a Python dictionary following this structure:\n``` python\n{\n    'start_nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<start_node_name>',\n            'BPMNtype': 'startEvent',\n            'incoming': [],\n            'outgoing': ['<next_node_id>']\n        }\n    ],\n    'nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<node_name>',\n            'BPMNtype': '<BPMN_element_type>',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': ['<next_node_id>']\n        },\n        ...\n    ],\n    'end_nodes': [\n        {   \n            'id': '<unique_id>',\n            'name': '<end_node_name>',\n            'BPMNtype': 'endEvent',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': []\n        }\n    ],\n    'lanes' : [\n        {\n            'id': '<unique_id>',\n            'name' : '<lane_name>',\n            'nodes' : ['<id_of_node_in_lane>', ...]\n        },\n        ...\n    ]\n}\n```\nKey Rules:\n1. Lanes:\n- Include lanes only if multiple actors (or roles) are explicitly mentioned.\n- Exclude lanes if only \"You\" is mentioned as the actor.\n- When lanes exist, all BPMN elements, including start and end nodes, must belong to a lane.\n- Assign start and end nodes to the most appropriate lanes.\n2. Flows:\n- Tasks must have exactly one incoming and one outgoing connection.\n- Gateways:\n-- Splitting Gateway: 1 incoming, multiple outgoing.\n-- Merging Gateway: Multiple incoming, 1 outgoing.\n3. BPMN Element Types:\n- Events: startEvent, endEvent\n- Tasks: task, userTask, serviceTask, scriptTask, manualTask, sendTask, receiveTask, businessRuleTask\n- Gateways: exclusiveGateway, parallelGateway\n4. Output Requirements:\n- Produce a valid JSON-like Python dictionary.\n- Ensure unique IDs and valid connections.",
+        "input": "Here's the textual description you have to analyze: \nThe following text is about the submission of the final grades. It begins when you ensure that 'EX' or zero marks are applied as needed.\nOnce the need applies, the 'EX' or zero marks should be calculated.\nWhen the determination of the grades is finished, one or more of the following paths should be executed: reviewing course summary, applying any changes.\nAfter the review of the course summary, the review of grade summary should be done.\nOne or more of the following paths are then executed: recalculating the grades, exporting the final grades.\nWhen a recalculation of grades is completed, you should export the course summary.\nThen one or more of the following paths should be executed: receiving approval signatures of the course director, submitting results to SSO, and sending grades approval sheets to examiners.\nThe process has now been completed.",
+        "true_task": [
+            "ensure 'EX' or zero marks are applied as need",
+            "calculate the grades",
+            "review course summary",
+            "apply any changes",
+            "review grades summary",
+            "recalculate the grades",
+            "export the final grades",
+            "export the course summary",
+            "get approval signatures by the course director",
+            "submit results to SSO",
+            "send examiners grade approval sheet"
+        ],
+        "true_actors": []
+    },
+    {
+        "instruction": "You are an expert in transforming process descriptions into structured BPMN representations. Your task is to generate a Python dictionary following this structure:\n``` python\n{\n    'start_nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<start_node_name>',\n            'BPMNtype': 'startEvent',\n            'incoming': [],\n            'outgoing': ['<next_node_id>']\n        }\n    ],\n    'nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<node_name>',\n            'BPMNtype': '<BPMN_element_type>',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': ['<next_node_id>']\n        },\n        ...\n    ],\n    'end_nodes': [\n        {   \n            'id': '<unique_id>',\n            'name': '<end_node_name>',\n            'BPMNtype': 'endEvent',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': []\n        }\n    ],\n    'lanes' : [\n        {\n            'id': '<unique_id>',\n            'name' : '<lane_name>',\n            'nodes' : ['<id_of_node_in_lane>', ...]\n        },\n        ...\n    ]\n}\n```\nKey Rules:\n1. Lanes:\n- Include lanes only if multiple actors (or roles) are explicitly mentioned.\n- Exclude lanes if only \"You\" is mentioned as the actor.\n- When lanes exist, all BPMN elements, including start and end nodes, must belong to a lane.\n- Assign start and end nodes to the most appropriate lanes.\n2. Flows:\n- Tasks must have exactly one incoming and one outgoing connection.\n- Gateways:\n-- Splitting Gateway: 1 incoming, multiple outgoing.\n-- Merging Gateway: Multiple incoming, 1 outgoing.\n3. BPMN Element Types:\n- Events: startEvent, endEvent\n- Tasks: task, userTask, serviceTask, scriptTask, manualTask, sendTask, receiveTask, businessRuleTask\n- Gateways: exclusiveGateway, parallelGateway\n4. Output Requirements:\n- Produce a valid JSON-like Python dictionary.\n- Ensure unique IDs and valid connections.",
+        "input": "Here's the textual description you have to analyze: The process begins with someone considering how to effectively connect with people, aiming to gather their opinions through a survey. Once a plan is devised, the survey is distributed, and then there is a period of waiting to collect the responses. After gathering initial results, the next step involves analyzing the respondents to determine whether a sufficient number of responses have been received or if more outreach is required. If not enough responses are collected, there are a few approaches to explore: finding new potential participants, particularly those who fit the target audience; identifying additional ways to access the desired respondents; or distributing the survey further in hopes that recipients might forward it to others. This cycle of reaching out, sending surveys, and analyzing respondents continues until a sufficient number of suitable participants have responded. Once there are enough responses, the process wraps up with the creation of a statistical summary, detailing the survey findings.",
+        "true_task": [
+            "Think of ways to reach out to people  ",
+            "Send out survey",
+            "Check for results",
+            "Search for the suitable potential respondents",
+            "Search for ways to reach the target respondents",
+            "Send the survey to more people who could forward it",
+            "Send the surveys to suitable potential responendts",
+            "Analyse the respondendts",
+            "Create statistical summary of the results"
+        ],
+        "true_actors": []
+    },
+    {
+        "instruction": "You are an expert in transforming process descriptions into structured BPMN representations. Your task is to generate a Python dictionary following this structure:\n``` python\n{\n    'start_nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<start_node_name>',\n            'BPMNtype': 'startEvent',\n            'incoming': [],\n            'outgoing': ['<next_node_id>']\n        }\n    ],\n    'nodes': [\n        {\n            'id': '<unique_id>',\n            'name': '<node_name>',\n            'BPMNtype': '<BPMN_element_type>',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': ['<next_node_id>']\n        },\n        ...\n    ],\n    'end_nodes': [\n        {   \n            'id': '<unique_id>',\n            'name': '<end_node_name>',\n            'BPMNtype': 'endEvent',\n            'incoming': ['<previous_node_id>'],\n            'outgoing': []\n        }\n    ],\n    'lanes' : [\n        {\n            'id': '<unique_id>',\n            'name' : '<lane_name>',\n            'nodes' : ['<id_of_node_in_lane>', ...]\n        },\n        ...\n    ]\n}\n```\nKey Rules:\n1. Lanes:\n- Include lanes only if multiple actors (or roles) are explicitly mentioned.\n- Exclude lanes if only \"You\" is mentioned as the actor.\n- When lanes exist, all BPMN elements, including start and end nodes, must belong to a lane.\n- Assign start and end nodes to the most appropriate lanes.\n2. Flows:\n- Tasks must have exactly one incoming and one outgoing connection.\n- Gateways:\n-- Splitting Gateway: 1 incoming, multiple outgoing.\n-- Merging Gateway: Multiple incoming, 1 outgoing.\n3. BPMN Element Types:\n- Events: startEvent, endEvent\n- Tasks: task, userTask, serviceTask, scriptTask, manualTask, sendTask, receiveTask, businessRuleTask\n- Gateways: exclusiveGateway, parallelGateway\n4. Output Requirements:\n- Produce a valid JSON-like Python dictionary.\n- Ensure unique IDs and valid connections.",
+        "input": "Here's the textual description you have to analyze: The process begins in the front office, where an order is received. The front office then prepares the product specifications, taking care to check if there are sufficient materials available in the inventory. Once confirmed, the product specifications are sent to both the manufacturing department and a specialist. The manufacturing department receives the specifications and begins to prepare the base of the product. After updating the inventory, they test the product base, which takes about 30 minutes. If the base is satisfactory, they move on; if not, they redo the base preparation. Meanwhile, the specialist also receives the product specifications and prepares the active substances, updating the inventory afterward. With both the base and active substances ready, a sample of the final product is prepared and tested. If the test is successful, the product is prepared for the customer, and the packaging is done. In case the test is not successful, the active substance is redone, and the process loops back to preparing another sample. The process cycle involves thorough testing and reevaluation to ensure quality before ultimately preparing the package for the final delivery to the customer.",
+        "true_task": [
+            "Receive order",
+            "Prepare product specification",
+            "Check if enough materials are in inventory",
+            "Prepare basis of product",
+            "Update inventory ",
+            "Test basis of product",
+            "Send product specification",
+            "Prepare sample final product",
+            "Test sample",
+            "Prepare product for customer",
+            "Prepare package",
+            "Prepare active substance",
+            "Update inventory",
+            "Receive product specification",
+            "Receive product specification",
+            "Redo active substance"
+        ],
+        "true_actors": [
+            "Front office",
+            "Manufacturing department",
+            "Specialist"
+        ]
+    }
+]

@@ -1,0 +1,115 @@
+from utils.conversion_utils import BPMN
+from utils.utils import load_files_from_specific_folder, read_file
+
+from unsloth.chat_templates import get_chat_template
+from unsloth import FastLanguageModel
+import time
+import os
+import ast
+from pydantic import ValidationError
+
+
+def generate_bpmn(instruction, description_path, output_dir, model, tokenizer):
+    total_retries = 0
+    processed_files = 0
+
+    # We'll measure the total time to process each file
+    file_times = []
+
+    for file in description_path:
+        description = read_file(file)
+
+        # Start timing for this file
+        start_file_time = time.time()
+
+        messages = [
+            {"role": "system", "content": instruction},
+            {"role": "user", "content": f": Please generate the JSON file for the following textual description: + {description}."}
+        ]
+
+        retries = 0
+        while retries < 10:
+            print(f"Processing file: {file}")
+            inputs = tokenizer.apply_chat_template(
+                messages,
+                tokenize=True,
+                add_generation_prompt=True,
+                return_tensors='pt',
+                padding=True
+            ).to("cuda")
+
+            try:
+                print("Generating BPMN...")
+                outputs = model.generate(inputs, max_new_tokens=3048, num_return_sequences=1)
+                text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+                # Extract assistant response
+                output = text.split("assistant", 1)[-1].strip()
+
+                # Parse as Python dictionary
+                try:
+                    parsed_output = ast.literal_eval(output)
+                    if not isinstance(parsed_output, dict):
+                        raise ValueError("Parsed output is not a dictionary")
+                except (SyntaxError, ValueError) as e:
+                    print(f"Error parsing output as dictionary: {e}")
+                    retries += 1
+                    continue  # Retry the generation
+
+                print("Validating BPMN...")
+                bpmn_instance = BPMN(**parsed_output)
+                print("Validation successful!")
+                break  # Exit loop if validation is successful
+
+            except (ValidationError, KeyError, TypeError) as e:
+                print(f"Error during BPMN validation: {e}")
+                retries += 1
+
+        # Keep track of how many total retries happened across all files
+        total_retries += retries
+        processed_files += 1
+
+        # Save output to the specified folder
+        output_file_path = os.path.join(
+            output_dir,
+            os.path.basename(file).replace(".txt", ".bpmn")
+        )
+        with open(output_file_path, "w", encoding="utf-8") as output_file:
+            output_file.write(str(output))  # Save as a valid Python dictionary format
+
+        # End timing for this file
+        end_file_time = time.time()
+        # Store the total time for processing this single file
+        file_times.append(end_file_time - start_file_time)
+
+    # Calculate averages
+    if processed_files > 0:
+        average_retries = total_retries / processed_files
+        average_file_time = sum(file_times) / processed_files
+    else:
+        average_retries = 0
+        average_file_time = 0
+
+    print(f"Average number of retries over all files: {average_retries:.2f}")
+    print(f"Average processing time per file (seconds): {average_file_time:.4f}")
+
+
+if __name__ == "__main__":
+        description_path = load_files_from_specific_folder("./data/", ".txt")
+        output_dir = ("./data/GRPO_JSON_4shots")
+        instruction = read_file("./instruction/JSON_4shots_instruction.txt")
+        model_path = "./outputs/checkpoint-300"
+
+        model, tokenizer = FastLanguageModel.from_pretrained(
+            model_name = model_path,
+            max_seq_length = 6024,
+            load_in_4bit = False,
+        )
+
+        tokenizer = get_chat_template(
+            tokenizer,
+            chat_template = "llama-3.1")
+
+        FastLanguageModel.for_inference(model)
+        
+        generate_bpmn(instruction, description_path, output_dir, model, tokenizer)

@@ -1,0 +1,2 @@
+Analyze the provided process description carefully and generate a BPMN diagram in XML format based on the process described in the text. 
+Ensure the response includes only the XML code for the BPMN diagram, excluding any explanatory text or commentary. Here is the description:

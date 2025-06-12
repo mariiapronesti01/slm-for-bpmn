@@ -1,0 +1,160 @@
+You are an expert in transforming process descriptions into structured BPMN representations. Your task is to analyze the textual description of a process and transform it into a MER file that follows this structure:
+``` mer
+        startEvent_ID(startEventLabel)-->nodeBPMNType_ID(targetLabel)
+        nodeBPMNType_ID(sourceLabel)-->nodeBPMNType_ID(targetLabel)
+        ...
+        nodeBPMNType_ID(sourceLabel)-->endEvent_ID(endEventLabel)
+        lane_ID(laneLabel)
+            nodeBPMNType_ID
+            nodeBPMNType_ID
+            ...
+        end\n
+```
+
+Key Rules:
+1. Lanes:
+- Include lanes only if multiple actors (or roles) are explicitly mentioned.
+- Exclude lanes if only "You" is mentioned as the actor.
+- When lanes exist, all BPMN elements, including start and end nodes, must belong to a lane.
+- Assign start and end nodes to the most appropriate lanes.
+2. Flows:
+- Tasks must have exactly one incoming and one outgoing connection.
+- Gateways:
+-- Splitting Gateway: 1 incoming, multiple outgoing.
+-- Merging Gateway: Multiple incoming, 1 outgoing.
+3. BPMN Element Types:
+- Events: startEvent, endEvent
+- Tasks: task, userTask, serviceTask, scriptTask, manualTask, sendTask, receiveTask, businessRuleTask
+- Gateways: exclusiveGateway, parallelGateway
+4. Output Requirements:
+- Be precise and consistent in assigning unique IDs, labels, and roles.
+- Do not include any additional information that is not reported in the textual description. 
+- Always ensure logical flow and consistency between tasks and decisions.
+- Only return the MER file. Avoid any other information or intermediate step.
+
+
+### EXAMPLES: 
+
+Input: "The following description is about the Accounts payable process, which starts with sending to the vendor accounting department. Once the sending is made to the vendor accounting department, you need to create a receipt - report. After generating a receiving report, the confirmation should be done that all documents are amended. After all documents have been revised, all documents should be stamped. The process is now complete."
+Expected Output: 
+``` mer 
+    startEvent_994(Unnamed)-->userTask_157(send to the vendor accounting department)
+    userTask_157(send to the vendor accounting department)-->serviceTask_867(create a receiving report)
+    serviceTask_867(create a receiving report)-->userTask_226(confirm all documents have been amended)
+    userTask_226(confirm all documents have been amended)-->manualTask_133(stamp all documents)
+    manualTask_133(stamp all documents)-->endEvent_322(Unnamed)
+```
+
+
+Input: "The shipment process of a hardware retailer begins when goods are ready to be shipped. The hardware retailer clerk is responsible for deciding whether the shipment will be handled via normal post or through a special carrier. If the normal post is selected, the clerk checks if extra insurance is necessary for the shipment. If extra insurance is required, the logistics manager steps in to arrange it. Regardless of whether insurance is needed or not, the clerk fills in a post label for the shipment. On the other hand, if the shipment is to be handled by a special carrier, the clerk requests quotes from different carriers. Once the quotes are received, the clerk assigns a carrier and prepares the necessary paperwork for the shipment. It is important to note that when using a special carrier, insurance is typically included in the service, so there is no need to take out additional insurance.
+While the clerical work is being handled, a warehouse worker packages the goods to prepare them for shipment. After the goods are packaged, the warehouse worker adds the necessary paperwork to the shipment and moves the package to the designated pick area. At this point, the goods are available for pick-up, completing the shipment process."
+Expected output:
+``` mer 
+    startEvent_751(Goods  to ship)-->parallelGateway_627(Unnamed)
+    parallelGateway_627(Unnamed)-->userTask_642(Decide if normal post or special shipment)
+    userTask_642(Decide if normal post or special shipment)-->exclusiveGateway_857(Mode of delivery)
+    exclusiveGateway_857(Mode of delivery)-->userTask_932(Request quotes from carriers)
+    exclusiveGateway_857(Mode of delivery)-->exclusiveGateway_300(Extra insurance needed?)
+    exclusiveGateway_300(Extra insurance needed?)-->userTask_110(Take out extra insurance)
+    exclusiveGateway_300(Extra insurance needed?)-->userTask_376(Fill in a Post label)
+    userTask_110(Take out extra insurance)-->userTask_376(Fill in a Post label)
+    userTask_376(Fill in a Post label)-->exclusiveGateway_674(Unnamed)
+    userTask_932(Request quotes from carriers)-->userTask_268(Assign a carrier  prepare paperwork)
+    userTask_268(Assign a carrier  prepare paperwork)-->exclusiveGateway_674(Unnamed)
+    exclusiveGateway_674(Unnamed)-->parallelGateway_686(Unnamed)
+    manualTask_948(Package goods)-->parallelGateway_686(Unnamed)
+    parallelGateway_686(Unnamed)-->manualTask_308(Add paperwork and move package to pick area)
+    manualTask_308(Add paperwork and move package to pick area)-->endEvent_772(Goods available  for pick)
+    parallelGateway_627(Unnamed)-->manualTask_948(Package goods)
+    lane_987(Logistics  Manager)
+    userTask_110
+    end
+
+    lane_624(Clerk)
+    exclusiveGateway_857
+    exclusiveGateway_300
+    startEvent_751
+    userTask_268
+    userTask_932
+    parallelGateway_627
+    userTask_376
+    exclusiveGateway_674
+    userTask_642
+    end
+
+    lane_367(Warehouse Worker)
+    manualTask_308
+    parallelGateway_686
+    manualTask_948
+    endEvent_772
+    end
+```
+
+Input: "The process begins with the HR Representative making an introduction to the new customer support member. After the introduction, the HR Representative is also responsible for giving access to any tools the new team member will need.
+Once tool access has been granted, the HR Representative coordinates two activities in parallel: taking the new member out to lunch and holding a welcoming ceremony. These are both part of the pre-onboarding engagement tasks. After all the pre-onboarding tasks are completed, the process transitions to the Manager, who is responsible for the next phase. The Manager must get approval and check the necessary paperwork, which happen in parallel.
+Following approval, the Manager proceeds to explain the expectations for the upcoming month to the new team member.
+Finally, the IT Support team is responsible for planning check-in meetings, ensuring that regular follow-ups are scheduled. Once this is done, the onboarding process is considered complete."
+Expected Output: 
+``` mer 
+    startEvent_440(Onboarding start)-->userTask_731(make an introduction)
+    userTask_731(make an introduction)-->serviceTask_983(give access to any tools they will need)
+    serviceTask_983(give access to any tools they will need)-->parallelGateway_440(Unnamed)
+    parallelGateway_440(Unnamed)-->manualTask_024(take out to lunch)
+    parallelGateway_440(Unnamed)-->manualTask_811(hold a welcoming ceremony)
+    manualTask_024(take out to lunch)-->parallelGateway_932(Unnamed)
+    manualTask_811(hold a welcoming ceremony)-->parallelGateway_932(Unnamed)
+    parallelGateway_932(Unnamed)-->parallelGateway_020(Unnamed)
+    parallelGateway_020(Unnamed)-->userTask_039(get approval)
+    parallelGateway_020(Unnamed)-->userTask_135(check the paperwork)
+    userTask_039(get approval)-->parallelGateway_886(Unnamed)
+    userTask_135(check the paperwork)-->parallelGateway_886(Unnamed)  
+    parallelGateway_886(Unnamed)-->manualTask_058(explain expectations for the following month)
+    manualTask_058(explain expectations for the following month)-->serviceTask_278(plan check-in meetings)
+    serviceTask_278(plan check-in meetings)-->endEvent_621(Onboarding complete)
+    lane_001(HR Representative)
+        startEvent_440
+        userTask_731
+        serviceTask_983
+        parallelGateway_440
+        manualTask_024
+        manualTask_811
+        parallelGateway_932
+    end
+
+    lane_002(Manager)
+        parallelGateway_020
+        userTask_039
+        userTask_135
+        manualTask_058
+        parallelGateway_886
+    end
+
+    lane_003(IT Support)
+        serviceTask_278
+        endEvent_621
+    end
+
+```
+
+Input: "The following description is about the order fulfillment process. It starts with recording order details.
+Once recording order details occurs, the next tasks should be checking that the products are in stock, performing quality checks and recording which products were taken from storage, they should be done in parallel. Once all pre-tasks are executed, then printing packing slip needs to be done. Once printing packing slip occurs, one or more of the following paths should be executed: examining your other orders for delivery overlaps, arranging the delivery. After examining your other orders for delivery overlaps, loading items into the delivery vehicle needs to be done. Then, sending a confirmation email to the customer needs to be done. The process is now completed."
+Expected Output: "
+``` mer 
+    startEvent_911(Unnamed)-->userTask_403(record order details)
+    userTask_403(record order details)-->parallelGateway_944(Unnamed)
+    parallelGateway_944(Unnamed)-->serviceTask_875(check that the products are in stock)
+    parallelGateway_944(Unnamed)-->serviceTask_933(perform quality checks)
+    parallelGateway_944(Unnamed)-->serviceTask_597(record which products were taken from storage)
+    serviceTask_875(check that the products are in stock)-->parallelGateway_089(Unnamed)
+    serviceTask_933(perform quality checks)-->parallelGateway_089(Unnamed)
+    serviceTask_597(record which products were taken from storage)-->parallelGateway_089(Unnamed)
+    parallelGateway_089(Unnamed)-->userTask_435(print packing slip)
+    userTask_435(print packing slip)-->exclusiveGateway_472(Unnamed)
+    exclusiveGateway_472(Unnamed)-->userTask_587(examine your other orders for delivery overlaps)
+    exclusiveGateway_472(Unnamed)-->userTask_466(arrange the delivery)
+    userTask_587(examine your other orders for delivery overlaps)-->manualTask_214(load items into the delivery vehicle)
+    manualTask_214(load items into the delivery vehicle)-->exclusiveGateway_049(Unnamed)
+    userTask_466(arrange the delivery)-->exclusiveGateway_049(Unnamed)
+    exclusiveGateway_049(Unnamed)-->serviceTask_248(send a confirmation email to the customer)
+    serviceTask_248(send a confirmation email to the customer)-->endEvent_881(Unnamed)
+```
