@@ -7,6 +7,7 @@ import time
 import os
 import ast
 from pydantic import ValidationError
+import argparse
 
 
 def generate_bpmn(instruction, description_path, output_dir, model, tokenizer):
@@ -95,11 +96,30 @@ def generate_bpmn(instruction, description_path, output_dir, model, tokenizer):
 
 
 if __name__ == "__main__":
-        description_path = load_files_from_specific_folder("./data/", ".txt")
-        output_dir = ("./data/GRPO_JSON_4shots")
-        instruction = read_file("./instruction/JSON_4shots_instruction.txt")
-        model_path = "./outputs/checkpoint-300"
-
+        parser = argparse.ArgumentParser(description="Generate BPMN from textual descriptions using a pre-trained model.")
+        parser.add_argument("--model_path", type=str, default="unsloth/Llama-3.2-3B-Instruct", help="Model name or path")
+        parser.add_argument("--instruction_path", type=str, default="./prompt/JSON/SFT_prompt.txt", help="Path to the system prompt file")
+        parser.add_argument("--description_path", type=str, help="Path to the folder containing the description files")
+        parser.add_argument("--output_dir", type=str, default="./output/JSON/SFT/", help="Directory to save the generated BPMN files")
+        
+        args = parser.parse_args()
+        model_path = args.model_path
+        instruction_path = args.instruction_path
+        description_path = load_files_from_specific_folder(args.description_path)
+        output_dir = args.output_dir
+        
+        # Ensure output directory exists
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Check if model path exists
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model path {model_path} does not exist.")
+        
+        # Check if description path exists
+        if not os.path.exists(args.description_path):
+            raise FileNotFoundError(f"Description path {args.description_path} does not exist.")
+        
+        # Load the model and tokenizer
         model, tokenizer = FastLanguageModel.from_pretrained(
             model_name = model_path,
             max_seq_length = 6024,
@@ -111,5 +131,8 @@ if __name__ == "__main__":
             chat_template = "llama-3.1")
 
         FastLanguageModel.for_inference(model)
+        
+        # Read the instruction from the file
+        instruction = read_file(instruction_path)
         
         generate_bpmn(instruction, description_path, output_dir, model, tokenizer)
