@@ -34,7 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("--max_seq_length", type=int, default=6024, help="Maximum sequence length for the model")
     parser.add_argument("--dtype", type=str, choices=["float16", "bfloat16", "auto"], default="auto", help="Data type for the model (float16, bfloat16, or auto)")
     parser.add_argument("--load_in_4bit", action="store_true", help="Load model in 4-bit precision")
-    parser.add_argument("--hf_token", type=str, required=True, default="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", help="Hugging Face token for authentication")
+    parser.add_argument("--hf_token", type=str, required=True, default="hf_YOUR_HF_TOKEN", help="Hugging Face token for authentication")
     parser.add_argument("--train_data_path", type=str, default="./dataset/train.json", help="Path to the training data file")
     parser.add_argument("--val_data_path", type=str, default="./dataset/val.json", help="Path to the validation data file")
     parser.add_argument("--output_dir", type=str, default="./outputs/", help="Directory to save the model checkpoints and outputs")
