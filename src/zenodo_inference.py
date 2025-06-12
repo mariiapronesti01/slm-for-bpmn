@@ -28,7 +28,7 @@ def generate_bpmn(instruction, description_path, output_dir, model, tokenizer):
         ]
 
         retries = 0
-        while retries < 10:
+        while retries < 3:
             print(f"Processing file: {file}")
             inputs = tokenizer.apply_chat_template(
                 messages,
